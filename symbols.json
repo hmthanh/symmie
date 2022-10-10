@@ -1,0 +1,17 @@
+{
+  "U+7B": "bracket:curly:left",
+  "U+7D": "bracket:curly:right",
+  "U+7E": "tilde",
+  "U+80": "euro",
+  "U+A3": "pound",
+  "U+A5": "yen",
+  "U+A9": "copyright",
+  "U+3C0": "pi",
+  "U+3C1": "rho",
+  "U+2190": "arrow:left",
+  "U+2191": "arrow:top",
+  "U+2192": "arrow:right",
+  "U+2193": "arrow:bottom",
+  "U+2194": "arrow:left:right",
+  "U+222B": "integral"
+}
