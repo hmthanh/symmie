@@ -6,17 +6,34 @@ createRoot(document.getElementById("root")).render(<Tool />);
 /// The whole tool.
 function Tool() {
   const [filter, setFilter] = React.useState("");
+  const [yellow, setYellow] = React.useState(false);
   const [codepoints, _] = useRemote("codepoints", []);
   const [symbols, setSymbols] = useRemote("symbols", {});
+
+  let set = new Set();
+  let dups = [];
+  for (const name of Object.values(symbols)) {
+    if (name) {
+      const parts = name.split(":");
+      let tail = parts.slice(1);
+      tail.sort();
+      const canon = parts[0] + ":" + tail.join(":");
+      if (set.has(canon)) {
+        dups.push(canon);
+      }
+      set.add(canon);
+    }
+  }
 
   let list = [];
   let prev = undefined;
   for (const { code, title, block } of codepoints) {
     const name = symbols[code] || "";
     if (
-      filter === "" ||
-      title.toLowerCase().includes(filter.toLowerCase()) ||
-      name.toLowerCase().includes(filter.toLowerCase())
+      (!yellow || symbols[code] === null) &&
+      (filter === "" ||
+        title.toLowerCase().includes(filter.toLowerCase()) ||
+        name.toLowerCase().includes(filter.toLowerCase()))
     ) {
       if (block !== prev) {
         list.push(<h2 key={block}>{block}</h2>);
@@ -37,11 +54,20 @@ function Tool() {
 
   return (
     <main>
+      <h2>Setup</h2>
       Filter:&nbsp;
       <input
         type="search"
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
+      />
+      <br />
+      Duplicates: {dups.join(", ")} <br />
+      Yellow:{" "}
+      <input
+        type="checkbox"
+        value={yellow}
+        onChange={(e) => setYellow(e.target.checked)}
       />
       <div className="codepoints">{list}</div>
     </main>
