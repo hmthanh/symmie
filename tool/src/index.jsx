@@ -105,7 +105,7 @@ function ExcludedSymbol({ code, title, insert }) {
         className="x"
         onClick={(e) => {
           e.stopPropagation();
-          insert(title.toLowerCase());
+          insert(title.toLowerCase().replaceAll(" ", "-"));
         }}
       >
         +
@@ -117,11 +117,6 @@ function ExcludedSymbol({ code, title, insert }) {
 
 /// A single included symbol item.
 function IncludedSymbol({ code, title, name, rename, remove }) {
-  const ref = React.useRef(null);
-  React.useEffect(() => {
-    if (ref) ref.current.textContent = name || "(unnamed)";
-  }, [name]);
-
   return (
     <div className={"card included" + (name === null ? " unnamed" : "")}>
       <span className="title">{title}</span>
@@ -129,20 +124,10 @@ function IncludedSymbol({ code, title, name, rename, remove }) {
         x
       </button>
       <span className="symbol">{String.fromCodePoint(code)}</span>
-      <div
-        contentEditable
-        className="input"
-        ref={ref}
-        onClick={(e) => {
-          const selection = window.getSelection();
-          const range = document.createRange();
-          range.selectNodeContents(e.target);
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }}
-        onInput={(e) => {
-          if (e && e !== "<unnamed>") rename(e.target.textContent);
-        }}
+      <input
+        value={name}
+        placeholder="(unnamed)"
+        onInput={(e) => rename(e.target.value)}
       />
     </div>
   );
