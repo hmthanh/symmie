@@ -10,30 +10,33 @@ const blocks = [
   // Basics.
   "Basic Latin",
   "Latin-1 Supplement",
+  "General Punctuation",
+  "Currency Symbols",
+  "Small Form Variants",
+  "Ideographic Symbols and Punctuation",
+  "CJK Symbols and Punctuation",
   "Greek and Coptic",
   "Hebrew",
   "Letterlike Symbols",
-  "General Punctuation",
-  "Currency Symbols",
-  "Ideographic Symbols and Punctuation",
-  "Small Form Variants",
+  "Mathematical Alphanumeric Symbols",
 
   // Maths and tech
   "Mathematical Operators",
-  "Mathematical Alphanumeric Symbols",
   "Supplemental Mathematical Operators",
   "Miscellaneous Mathematical Symbols-A",
   "Miscellaneous Mathematical Symbols-B",
   "Miscellaneous Technical",
 
-  // Shapes and arrows.
-  "Geometric Shapes",
-  "Geometric Shapes Extended",
+  // Arrows.
   "Arrows",
   "Supplemental Arrows-A",
   "Supplemental Arrows-B",
   "Supplemental Arrows-C",
   "Miscellaneous Symbols and Arrows",
+
+  // Shapes.
+  "Geometric Shapes",
+  "Geometric Shapes Extended",
 
   // Emoji and more.
   "Miscellaneous Symbols",
@@ -69,7 +72,7 @@ function readBlocksAndCodepoints() {
         codepoints.push({ code: c.code, title: c.name, block: c.block });
     }
   }
-  codepoints.sort((a, b) => a < b);
+  codepoints.sort((a, b) => blocks.indexOf(a.block) - blocks.indexOf(b.block));
 }
 
 readSymbols();

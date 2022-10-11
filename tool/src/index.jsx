@@ -6,34 +6,20 @@ createRoot(document.getElementById("root")).render(<Tool />);
 /// The whole tool.
 function Tool() {
   const [filter, setFilter] = React.useState("");
-  const [yellow, setYellow] = React.useState(false);
+  const [yellow, setYellow] = React.useState(null);
   const [codepoints, _] = useRemote("codepoints", []);
   const [symbols, setSymbols] = useRemote("symbols", {});
 
-  let set = new Set();
-  let dups = [];
-  for (const name of Object.values(symbols)) {
-    if (name) {
-      const parts = name.split(":");
-      let tail = parts.slice(1);
-      tail.sort();
-      const canon = parts[0] + ":" + tail.join(":");
-      if (set.has(canon)) {
-        dups.push(canon);
-      }
-      set.add(canon);
-    }
-  }
+  const dups = findDuplicates(symbols);
 
   let list = [];
   let prev = undefined;
+  const regex = new RegExp(filter, "i");
   for (const { code, title, block } of codepoints) {
     const name = symbols[code] || "";
     if (
-      (!yellow || symbols[code] === null) &&
-      (filter === "" ||
-        title.toLowerCase().includes(filter.toLowerCase()) ||
-        name.toLowerCase().includes(filter.toLowerCase()))
+      (yellow === null || yellow.has(code)) &&
+      (filter === "" || title.match(regex) || name.match(regex))
     ) {
       if (block !== prev) {
         list.push(<h2 key={block}>{block}</h2>);
@@ -66,12 +52,43 @@ function Tool() {
       Yellow:{" "}
       <input
         type="checkbox"
-        value={yellow}
-        onChange={(e) => setYellow(e.target.checked)}
+        value={yellow !== null}
+        onChange={(e) => {
+          if (e.target.checked) {
+            const set = new Set();
+            for (const [code, value] of Object.entries(symbols)) {
+              if (value === null) {
+                set.add(parseInt(code));
+              }
+            }
+            setYellow(set);
+          } else {
+            setYellow(null);
+          }
+        }}
       />
       <div className="codepoints">{list}</div>
     </main>
   );
+}
+
+/// Finds all duplicates in a symbol list.
+function findDuplicates(symbols) {
+  let set = new Set();
+  let dups = [];
+  for (const name of Object.values(symbols)) {
+    if (name) {
+      const parts = name.split(":");
+      let tail = parts.slice(1);
+      tail.sort();
+      const canon = parts[0] + ":" + tail.join(":");
+      if (set.has(canon)) {
+        dups.push(canon);
+      }
+      set.add(canon);
+    }
+  }
+  return dups;
 }
 
 /// A single symbol item.
@@ -151,7 +168,7 @@ function IncludedSymbol({ code, title, name, rename, remove }) {
       </button>
       <span className="symbol">{String.fromCodePoint(code)}</span>
       <input
-        value={name}
+        value={name || ""}
         placeholder="(unnamed)"
         onInput={(e) => rename(e.target.value)}
       />
