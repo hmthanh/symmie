@@ -16,6 +16,7 @@ const blocks = [
   "General Punctuation",
   "Currency Symbols",
   "Ideographic Symbols and Punctuation",
+  "Small Form Variants",
 
   // Maths and tech
   "Mathematical Operators",
@@ -33,35 +34,15 @@ const blocks = [
   "Supplemental Arrows-B",
   "Supplemental Arrows-C",
   "Miscellaneous Symbols and Arrows",
-  "Box Drawing", // maybe not ...
-  "Block Elements", // maybe not ...
 
-  // Misc
+  // Emoji and more.
   "Miscellaneous Symbols",
-  "Small Form Variants",
   "Dingbats",
-  "Ancient Symbols",
-
-  // Music
-  "Musical Symbols",
-  "Ancient Greek Musical Notation",
-  "Byzantine Musical Symbols",
-
-  // Emoji
   "Miscellaneous Symbols and Pictographs",
   "Emoticons",
   "Transport and Map Symbols",
   "Supplemental Symbols and Pictographs",
   "Symbols and Pictographs Extended-A",
-
-  // Games
-  "Mahjong Tiles",
-  "Domino Tiles",
-  "Playing Cards",
-  "Chess Symbols",
-
-  // Alchemy
-  "Alchemical Symbols",
 ];
 
 function readSymbols() {
@@ -88,6 +69,7 @@ function readBlocksAndCodepoints() {
         codepoints.push({ code: c.code, title: c.name, block: c.block });
     }
   }
+  codepoints.sort((a, b) => a < b);
 }
 
 readSymbols();
@@ -104,15 +86,9 @@ app.get("/font", (_, res) => res.send(font));
 app.get("/blocks", (_, res) => res.send(blocks));
 app.get("/codepoints", (_, res) => res.send(codepoints));
 app.get("/symbols", (_, res) => res.send(symbols));
-app.post("/symbols/:code", (req, res) => {
-  const code = req.params.code;
-  symbols[code] = null;
-  writeSymbols();
-  res.end();
-});
 app.put("/symbols/:code", (req, res) => {
   const code = req.params.code;
-  const name = req.query.name;
+  const name = req.query.name || null;
   symbols[code] = name;
   writeSymbols();
   res.end();

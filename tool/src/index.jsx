@@ -5,30 +5,44 @@ createRoot(document.getElementById("root")).render(<Tool />);
 
 /// The whole tool.
 function Tool() {
+  const [filter, setFilter] = React.useState("");
   const [codepoints, _] = useRemote("codepoints", []);
   const [symbols, setSymbols] = useRemote("symbols", {});
 
   let list = [];
   let prev = undefined;
   for (const { code, title, block } of codepoints) {
-    if (block !== prev) {
-      list.push(<h2>{block}</h2>);
-    }
-    list.push(
-      <Symbol
-        key={code}
-        code={code}
-        title={title}
-        symbols={symbols}
-        setSymbols={setSymbols}
-      />
-    );
+    const name = symbols[code] || "";
+    if (
+      filter === "" ||
+      title.toLowerCase().includes(filter.toLowerCase()) ||
+      name.toLowerCase().includes(filter.toLowerCase())
+    ) {
+      if (block !== prev) {
+        list.push(<h2 key={block}>{block}</h2>);
+      }
+      list.push(
+        <Symbol
+          key={code}
+          code={code}
+          title={title}
+          symbols={symbols}
+          setSymbols={setSymbols}
+        />
+      );
 
-    prev = block;
+      prev = block;
+    }
   }
 
   return (
     <main>
+      Filter:&nbsp;
+      <input
+        type="search"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+      />
       <div className="codepoints">{list}</div>
     </main>
   );
@@ -66,9 +80,15 @@ function Symbol({ code, title, symbols, setSymbols }) {
       <ExcludedSymbol
         code={code}
         title={title}
-        insert={async () => {
-          if (await request("POST", `symbols/${code}`)) {
-            setSymbols((symbols) => ({ ...symbols, [code]: null }));
+        insert={async (name) => {
+          if (typeof name === "string") {
+            if (await request("PUT", `symbols/${code}?name=${name}`)) {
+              setSymbols((symbols) => ({ ...symbols, [code]: name }));
+            }
+          } else {
+            if (await request("PUT", `symbols/${code}`)) {
+              setSymbols((symbols) => ({ ...symbols, [code]: null }));
+            }
           }
         }}
       />
@@ -79,9 +99,18 @@ function Symbol({ code, title, symbols, setSymbols }) {
 /// A single excluded symbol item.
 function ExcludedSymbol({ code, title, insert }) {
   return (
-    <div className="card" onClick={insert}>
+    <div className="card" onClick={() => insert()}>
       <span className="title">{title}</span>
-      <span className="symbol">{String.fromCharCode(code)}</span>
+      <button
+        className="x"
+        onClick={(e) => {
+          e.stopPropagation();
+          insert(title.toLowerCase());
+        }}
+      >
+        +
+      </button>
+      <span className="symbol">{String.fromCodePoint(code)}</span>
     </div>
   );
 }
@@ -99,7 +128,7 @@ function IncludedSymbol({ code, title, name, rename, remove }) {
       <button className="x" onClick={remove}>
         x
       </button>
-      <span className="symbol">{String.fromCharCode(code)}</span>
+      <span className="symbol">{String.fromCodePoint(code)}</span>
       <div
         contentEditable
         className="input"
