@@ -2,3 +2,5 @@
 tool/node_modules
 tool/package-lock.json
 tool/ucd
+target
+Cargo.lock
