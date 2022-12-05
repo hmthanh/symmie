@@ -148,7 +148,7 @@ function ExcludedSymbol({ code, title, insert }) {
         className="x"
         onClick={(e) => {
           e.stopPropagation();
-          insert(title.toLowerCase().replaceAll(" ", "-"));
+          insert(title.toLowerCase().replaceAll(" ", ""));
         }}
       >
         +
