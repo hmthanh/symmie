@@ -11,7 +11,7 @@ use core::fmt::{self, Debug, Formatter};
 include!("symbols.rs");
 
 /// The default modifiers for tie-breaking.
-const DEFAULTS: &[Modifier] = &[Modifier::new("r")];
+const DEFAULTS: &[Modifier] = &[Modifier::new("r"), Modifier::new("smile")];
 
 /// Get a symbol by its symmy notation.
 ///
@@ -109,22 +109,5 @@ impl Debug for Modifier {
         let bytes = self.0.to_be_bytes();
         let name = core::str::from_utf8(&bytes).unwrap();
         name.trim_end_matches('\0').fmt(f)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::get;
-
-    #[test]
-    fn test_get() {
-        assert_eq!(get("arrow:u"), Some('\u{2191}'));
-        assert_eq!(get("arrow"), Some('\u{2192}'));
-        assert_eq!(get("face:grin"), Some('😀'));
-        assert_eq!(get("in"), Some('∈'));
-        assert_eq!(get("integral:ccw:cont"), Some('∳'));
-        assert_eq!(get("nonexistant"), None);
-        assert_eq!(get("pi"), Some('π'));
-        assert_eq!(get("turtle"), Some('🐢'));
     }
 }
