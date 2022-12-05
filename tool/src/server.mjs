@@ -70,7 +70,7 @@ function runServer(symbols, codepoints) {
     next();
   });
 
-  const font = fs.readFileSync("../fonts/LatinModernMath.otf");
+  const font = fs.readFileSync("../fonts/NewCMMath.otf");
   app.get("/font", (_, res) => res.send(font));
   app.get("/codepoints", (_, res) => res.send(codepoints));
   app.get("/symbols", (_, res) => res.send(symbols));
