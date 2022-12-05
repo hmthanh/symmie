@@ -57,7 +57,7 @@ main();
 // Entry point.
 function main() {
   const codepoints = readCodepoints();
-  const symbols = readSymbolJson();
+  const symbols = readSymbols();
   runServer(symbols, codepoints);
 }
 
@@ -78,13 +78,13 @@ function runServer(symbols, codepoints) {
     const code = req.params.code;
     const name = req.query.name || null;
     symbols[code] = name;
-    writeSymbolJson(symbols);
+    writeSymbols(symbols);
     res.end();
   });
   app.delete("/symbols/:code", (req, res) => {
     const code = req.params.code;
     delete symbols[code];
-    writeSymbolJson(symbols);
+    writeSymbols(symbols);
     res.end();
   });
 
@@ -124,7 +124,7 @@ function readCodepoints() {
 }
 
 /// Read the symbols from the JSON file.
-function readSymbolJson() {
+function readSymbols() {
   const raw = JSON.parse(fs.readFileSync("../src/symbols.json"));
   return Object.fromEntries(
     Object.entries(raw).map(([name, code]) => [
@@ -135,13 +135,15 @@ function readSymbolJson() {
 }
 
 /// Write the symbols to the JSON file.
-function writeSymbolJson(symbols) {
+function writeSymbols(symbols) {
   const entries = Object.entries(symbols).map(([code, name]) => {
     const hex = parseInt(code).toString(16).toUpperCase();
     return [name, "U+" + hex];
   });
 
-  entries.sort((a, b) => a[0].localeCompare(b[0]));
+  entries.sort((a, b) =>
+    Buffer.compare(Buffer.from(a[0], "utf-8"), Buffer.from(b[0], "utf-8"))
+  );
 
   const raw = Object.fromEntries(entries);
   fs.writeFileSync("../src/symbols.json", JSON.stringify(raw, null, 2) + "\n");
