@@ -127,17 +127,22 @@ function readCodepoints() {
 function readSymbolJson() {
   const raw = JSON.parse(fs.readFileSync("../src/symbols.json"));
   return Object.fromEntries(
-    Object.entries(raw).map(([k, v]) => [parseInt(k.slice(2), 16), v])
+    Object.entries(raw).map(([name, code]) => [
+      parseInt(code.slice(2), 16),
+      name,
+    ])
   );
 }
 
 /// Write the symbols to the JSON file.
 function writeSymbolJson(symbols) {
-  const raw = Object.fromEntries(
-    Object.entries(symbols).map(([k, v]) => {
-      const hex = parseInt(k).toString(16).toUpperCase();
-      return ["U+" + hex, v];
-    })
-  );
+  const entries = Object.entries(symbols).map(([code, name]) => {
+    const hex = parseInt(code).toString(16).toUpperCase();
+    return [name, "U+" + hex];
+  });
+
+  entries.sort((a, b) => a[0].localeCompare(b[0]));
+
+  const raw = Object.fromEntries(entries);
   fs.writeFileSync("../src/symbols.json", JSON.stringify(raw, null, 2) + "\n");
 }
