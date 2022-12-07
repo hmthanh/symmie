@@ -11,7 +11,8 @@ use core::fmt::{self, Debug, Formatter};
 include!("symbols.rs");
 
 /// The default modifiers for tie-breaking.
-const DEFAULTS: &[Modifier] = &[Modifier::new("r"), Modifier::new("smile")];
+const DEFAULTS: &[Modifier] =
+    &[Modifier::new("r"), Modifier::new("filled"), Modifier::new("smile")];
 
 /// Get a symbol by its symmy notation.
 ///
