@@ -11,8 +11,13 @@ use core::fmt::{self, Debug, Formatter};
 include!("symbols.rs");
 
 /// The default modifiers for tie-breaking.
-const DEFAULTS: &[Modifier] =
+static DEFAULTS: &[Modifier] =
     &[Modifier::new("r"), Modifier::new("filled"), Modifier::new("smile")];
+
+/// List all pairs of notation and symbol.
+pub fn list() -> &'static [(&'static str, char)] {
+    LIST
+}
 
 /// Get a symbol by its symmy notation.
 ///
@@ -40,7 +45,7 @@ pub fn get(notation: &str) -> Option<char> {
     }
 
     // Find the first table entry with this name.
-    let start = match TABLE.binary_search_by_key(&name, |c| c.0) {
+    let start = match LIST.binary_search_by_key(&name, |c| c.0) {
         Ok(i) => i,
         Err(i) => i,
     };
@@ -49,8 +54,8 @@ pub fn get(notation: &str) -> Option<char> {
     let mut best_score = None;
 
     // Find the best table entry with this name.
-    for i in start..TABLE.len() {
-        let candidate = TABLE[i];
+    for i in start..LIST.len() {
+        let candidate = LIST[i];
 
         let mut candidate_parts = candidate.0.split(':');
         let candidate_name = candidate_parts.next();
