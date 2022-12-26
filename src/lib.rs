@@ -40,8 +40,10 @@ pub fn get(notation: &str) -> Option<char> {
     let name = parts.next()?;
     for part in parts.take(array.len()) {
         let len = modifiers.len();
-        array[len] = Modifier::new(part);
-        modifiers = &array[..len + 1];
+        if part.len() <= 8 {
+            array[len] = Modifier::new(part);
+            modifiers = &array[..len + 1];
+        }
     }
 
     // Find the first table entry with this name.
